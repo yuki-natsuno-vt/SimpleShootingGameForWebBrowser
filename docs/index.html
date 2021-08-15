@@ -14,6 +14,8 @@ const FONT = "10pt monospace"
 const FONT_X = 7;
 const FONT_Y = 13;
 
+var level = 1;
+
 seed = 101010101;
 function resetSeed(){
   seed = 101010101;
@@ -128,9 +130,18 @@ class GameTitle extends Node{
     this.size.set(20 * 5, 11 * 8);
     this.pos.set((SCREEN_WIDTH / 2) - (this.size.x / 2) - 9, 30);
     this.isVisibled = true;
+    this.level = ["Normal", "Hard"];
   }
   
   update(){
+    if(!this.isVisibled) return;
+    
+    if(controller.up != 0){
+      level = 2;
+    }
+    else if(controller.down != 0){
+      level = 1;
+    }
   }
   
   draw(){
@@ -159,6 +170,10 @@ class GameTitle extends Node{
       ctx.fillStyle = rgb(128,128,128);
       ctx.fillText("Move : [Arrows]", pos.x + 9, pos.y + (fy * 12) + 10);
       ctx.fillText("Shot : [Z]"     , pos.x + 9, pos.y + (fy * 12) + 10 + FONT_Y);
+      
+      ctx.font = "8pt monospace";
+      ctx.fillStyle = rgb(128,128,128);
+      ctx.fillText("Level:" + this.level[level - 1], pos.x + FONT_X * 3, pos.y + 5 + FONT_Y * 10);
     }
   }
 }
@@ -222,7 +237,10 @@ class Score extends Node{
   
   draw(){
     ctx.font = FONT;
-    ctx.fillStyle = rgb(255,255,255);
+    switch(level){
+    case 1: ctx.fillStyle = rgb(255,255,255); break;
+    case 2: ctx.fillStyle = rgb(255,0,0); break;
+    }
     ctx.fillText('SCORE:' + this.score, this.pos.x + 1, this.pos.y + FONT_Y - 1);
   }
 };
@@ -507,7 +525,7 @@ class Enemy extends Node{
     this.animationCount = 0;
     this.speed = 1;
     this.hp = 0;
-    this.score = 10;
+    this.score = 10 * level;
     this.color = rgb(255,255,255);
     this.strategy = function(){};
     this.image = function(){};
@@ -566,7 +584,7 @@ class EnemyBullet extends Node{
 
 class EnemyManager{
   constructor(){
-    this.wait = 50;
+    this.wait = 50 / level;
     this.waitCount = 0;
   }
   
@@ -588,7 +606,7 @@ class EnemyManager{
         enemy.animationCount = 0;
         enemy.speed = 3;
         enemy.hp = 3;
-        enemy.score = 10;
+        enemy.score = 10 * level;
         enemy.color = rgb(128,255,255);
         enemy.image = function() {
           ctx.fillStyle = rgb(128,255,255);
@@ -607,7 +625,7 @@ class EnemyManager{
             this.hp = 0;
           }
           
-          if((this.animationCount % 100) == 20){
+          if((this.animationCount % (100 / level)) == 20){
             var eb = getEnemyBullet();
             if(eb != null){
               eb.isEnabled = true;
@@ -629,7 +647,7 @@ class EnemyManager{
         enemy.animationCount = 0;
         enemy.speed = 2;
         enemy.hp = 3;
-        enemy.score = 10;
+        enemy.score = 10 * level;
         enemy.color = rgb(128,255,255);
         enemy.image = function() {
           ctx.fillStyle = rgb(0,255,0);
@@ -644,7 +662,7 @@ class EnemyManager{
             this.hp = 0;
           }
           
-          if((this.animationCount % 75) == 0){
+          if((this.animationCount % (75 / level)) == 0){
             var eb = getEnemyBullet();
             if(eb != null){
               eb.isEnabled = true;
@@ -664,7 +682,7 @@ class EnemyManager{
         enemy.animationCount = 0;
         enemy.speed = 3;
         enemy.hp = 3;
-        enemy.score = 10;
+        enemy.score = 10 * level;
         enemy.color = rgb(128,255,255);
         enemy.image = function() {
           ctx.fillStyle = rgb(255,255,0);
@@ -679,7 +697,7 @@ class EnemyManager{
             this.hp = 0;
           }
           
-          if((this.animationCount % 50) == 0){
+          if((this.animationCount % (50 / level)) == 0){
             var eb = getEnemyBullet();
             if(eb != null){
               eb.isEnabled = true;
